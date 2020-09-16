@@ -2,7 +2,7 @@ import xml.etree.ElementTree as ET
 import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.cluster import KMeans
-
+import pprint
 # 1st step: importing data from xml file_________________________________________
 
 tree = ET.parse('post.xml')
@@ -160,15 +160,15 @@ for i in target_Segmentation:
         cluster3_Score.append(int(i['Score']))
 
 for i in range(len(cluster1_Id)):
-    if cluster1_Id[i] > 1000:
+    if cluster1_Id[i] > 2000:
         cluster1_Id[i] = 0
 
 for i in range(len(cluster2_Id)):
-    if cluster2_Id[i] > 1000:
+    if cluster2_Id[i] > 2000:
         cluster2_Id[i] = 0
 
 for i in range(len(cluster3_Id)):
-    if cluster3_Id[i] > 1000:
+    if cluster3_Id[i] > 2000:
         cluster3_Id[i] = 0
 
 plt.scatter(cluster1_Id, cluster1_Score, label="stars")
