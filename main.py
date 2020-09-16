@@ -171,9 +171,9 @@ for i in range(len(cluster3_Id)):
     if cluster3_Id[i] > 2000:
         cluster3_Id[i] = 0
 
-plt.scatter(cluster1_Id, cluster1_Score, label="stars")
-plt.scatter(cluster2_Id, cluster2_Score, label="circle")
-plt.scatter(cluster3_Id, cluster3_Score, label='square')
+plt.scatter(cluster1_Id, cluster1_Score, label="Cluster #1")
+plt.scatter(cluster2_Id, cluster2_Score, label="Cluster #2")
+plt.scatter(cluster3_Id, cluster3_Score, label='Cluster #3')
 
 plt.xlabel('Id')
 plt.ylabel('Score')
