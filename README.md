@@ -1,5 +1,5 @@
 # Implementation of Customer segmentation
-Deviding the customer of stackover flow 
+Customer segmentation of stackoverflow user's, using RFM and K-means algorithm based on python
 ## Deep into the Project
 this project is implementation of RFM segmentation and clustering using
 k-means algorith.
