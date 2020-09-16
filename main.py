@@ -1,8 +1,15 @@
 import pprint
 import xml.etree.ElementTree as ET
+import pandas as pd
+import matplotlib.pyplot as plt
+import sns as sns
+from sklearn.cluster import KMeans
+from sklearn.datasets.samples_generator import make_blobs
+import numpy as np
 
 
 # 1st step: importing data from xml file_________________________________________
+from sklearn.decomposition import PCA
 
 tree = ET.parse('post.xml')
 root = tree.getroot()
@@ -120,3 +127,72 @@ for i in target_Segmentation:
 
 
 # 4th step: Clustering _________________________________________
+
+Data = target_Segmentation
+df = pd.DataFrame(Data, columns=['MonetaryValue','Frequency','Recency','Score'])
+
+# 4.1 Elbow method to find optimal k
+# distortions = []
+# K = range(1,10)
+# for k in K:
+#     kmeanModel = KMeans(n_clusters=k)
+#     kmeanModel.fit(df)
+#     distortions.append(kmeanModel.inertia_)
+#
+# plt.figure(figsize=(16,8))
+# plt.plot(K, distortions, 'bx-')
+# plt.xlabel('k')
+# plt.ylabel('Distortion')
+# plt.title('The Elbow Method showing the optimal k')
+# plt.show()
+
+# 4.2 K-means clustering with opitaml k from elbow method
+kmeans = KMeans(n_clusters=3).fit(df)
+list_Counter = 0
+Clusters = []
+Clusters = kmeans.labels_
+for i in range(len(target_Segmentation)):
+    target_Segmentation[i]['Cluster'] = Clusters[i]
+
+
+cluster1_Id=[]
+cluster2_Id=[]
+cluster3_Id=[]
+cluster1_Score=[]
+cluster2_Score=[]
+cluster3_Score=[]
+for i in target_Segmentation:
+    if i['Cluster']==0:
+        cluster1_Id.append(int(i['ID']))
+        cluster1_Score.append(int(i['Score']))
+    elif i['Cluster'] ==1:
+        cluster2_Id.append(int(i['ID']))
+        cluster2_Score.append(int(i['Score']))
+    else:
+        cluster3_Id.append(int(i['ID']))
+        cluster3_Score.append(int(i['Score']))
+
+for i in range(len(cluster1_Id)):
+    if cluster1_Id[i]>1000:
+        cluster1_Id[i]=0
+
+for i in range(len(cluster2_Id)):
+    if cluster2_Id[i]>1000:
+        cluster2_Id[i]=0
+
+for i in range(len(cluster3_Id)):
+    if cluster3_Id[i]>1000:
+        cluster3_Id[i]=0
+
+
+plt.scatter(cluster1_Id, cluster1_Score, label="stars")
+plt.scatter(cluster2_Id, cluster2_Score, label="circle")
+plt.scatter(cluster3_Id, cluster3_Score, label='square')
+
+plt.xlabel('Id')
+plt.ylabel('Score')
+
+plt.title('Customer Segmentation Clustering')
+plt.legend()
+plt.show()
+
