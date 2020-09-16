@@ -67,3 +67,34 @@ target_Segmentation = new_l
 
 # 2.2 Frequency
 
+#Counting frequency of each customer
+for x in posts:
+    if 'OwnerUserId' in x:
+        frequency_Repeat = 0
+        for y in posts:
+            if 'OwnerUserId' in y :
+                if x['OwnerUserId'] == y['OwnerUserId']:
+                    frequency_Repeat +=1
+
+        for z in target_Segmentation:
+            if z['ID'] == x['OwnerUserId']:
+                z['Frequency'] = frequency_Repeat
+    else:
+        pass
+
+# turning frequency to Frequency variable of RFM
+number_Of_Segments = 5
+number_Of_Items_In_Segments = int(len(target_Segmentation)/5)
+
+target_Segmentation = sorted(target_Segmentation, key=lambda i: i['Frequency'])
+list_Counter = 0
+
+
+for i in range(number_Of_Segments):
+    for j in range(number_Of_Items_In_Segments):
+        target_Segmentation[list_Counter]['Frequency'] = i+1
+        list_Counter += 1
+
+# 2.3 Monetary value
+
+pprint.pprint(target_Segmentation)
