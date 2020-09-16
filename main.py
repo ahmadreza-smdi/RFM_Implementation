@@ -111,4 +111,12 @@ for i in range(number_Of_Segments):
 
 # RFM measure's saved in target segmentation
 
-# 3rd step: Clustering _________________________________________
+# 3rd step: Adding RFM Score _________________________________________
+
+#RFM score formulation = 5 * Monetary value + 3 * Frequency + 2 * Recency
+
+for i in target_Segmentation:
+    i['Score'] = 5*i['MonetaryValue'] + 3*i['Frequency'] + 2*i['Recency']
+
+
+# 4th step: Clustering _________________________________________
