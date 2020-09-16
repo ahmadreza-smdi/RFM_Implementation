@@ -1,15 +1,9 @@
-import pprint
 import xml.etree.ElementTree as ET
 import pandas as pd
 import matplotlib.pyplot as plt
-import sns as sns
 from sklearn.cluster import KMeans
-from sklearn.datasets.samples_generator import make_blobs
-import numpy as np
-
 
 # 1st step: importing data from xml file_________________________________________
-from sklearn.decomposition import PCA
 
 tree = ET.parse('post.xml')
 root = tree.getroot()
@@ -31,25 +25,23 @@ posts = etree_to_dict(root)
 posts = sorted(posts, key=lambda i: i['CreationDate'])
 
 number_Of_Segments = 5
-number_Of_Items_In_Segments = int(len(posts)/5)
+number_Of_Items_In_Segments = int(len(posts) / 5)
 
 global list_Counter
 list_Counter = 0
 target_Segmentation = []
 
-
 for i in range(number_Of_Segments):
     for j in range(number_Of_Items_In_Segments):
 
-        posts[list_Counter]['Recency'] = i+1
+        posts[list_Counter]['Recency'] = i + 1
 
         if 'OwnerUserId' in posts[list_Counter]:
-            target_Segmentation.append({'ID': posts[list_Counter]['OwnerUserId'], 'Recency': i+1})
+            target_Segmentation.append({'ID': posts[list_Counter]['OwnerUserId'], 'Recency': i + 1})
 
         list_Counter += 1
 
-
-#set highest Recency as user's Recency
+# set highest Recency as user's Recency
 
 target_Temp = []
 for x in target_Segmentation:
@@ -59,7 +51,7 @@ for x in target_Segmentation:
             temp = max(x['Recency'], y['Recency'])
     target_Temp.append({'ID': x['ID'], 'Recency': temp})
 
-#Remove duplicates in target
+# Remove duplicates in target
 
 seen = set()
 new_l = []
@@ -71,40 +63,37 @@ for d in target_Temp:
 
 target_Segmentation = new_l
 
-
 # 2.2 Frequency
 
-#Counting frequency of each customer
+# Counting frequency of each customer
 for x in posts:
     sum_Of_score = int(x['Score'])
     if 'OwnerUserId' in x:
         frequency_Repeat = 0
         for y in posts:
-            if 'OwnerUserId' in y :
+            if 'OwnerUserId' in y:
                 if x['OwnerUserId'] == y['OwnerUserId']:
-                    frequency_Repeat +=1
+                    frequency_Repeat += 1
                     sum_Of_score = sum_Of_score + int(y['Score'])
 
         for z in target_Segmentation:
             if z['ID'] == x['OwnerUserId']:
                 z['Frequency'] = frequency_Repeat
 
-                #Counting customer's monetary value
-                z['MonetaryValue'] = int(sum_Of_score/frequency_Repeat)
+                z['MonetaryValue'] = int(sum_Of_score / frequency_Repeat)
     else:
         pass
 
 # turning frequency to Frequency variable of RFM
 number_Of_Segments = 5
-number_Of_Items_In_Segments = int(len(target_Segmentation)/5)
+number_Of_Items_In_Segments = int(len(target_Segmentation) / 5)
 
 target_Segmentation = sorted(target_Segmentation, key=lambda i: i['Frequency'])
 list_Counter = 0
 
-
 for i in range(number_Of_Segments):
     for j in range(number_Of_Items_In_Segments):
-        target_Segmentation[list_Counter]['Frequency'] = i+1
+        target_Segmentation[list_Counter]['Frequency'] = i + 1
         list_Counter += 1
 
 # 2.3 Monetary value
@@ -113,23 +102,22 @@ target_Segmentation = sorted(target_Segmentation, key=lambda i: i['MonetaryValue
 list_Counter = 0
 for i in range(number_Of_Segments):
     for j in range(number_Of_Items_In_Segments):
-        target_Segmentation[list_Counter]['MonetaryValue'] = i+1
+        target_Segmentation[list_Counter]['MonetaryValue'] = i + 1
         list_Counter += 1
 
 # RFM measure's saved in target segmentation
 
 # 3rd step: Adding RFM Score _________________________________________
 
-#RFM score formulation = 5 * Monetary value + 3 * Frequency + 2 * Recency
+# RFM score formulation = 5 * Monetary value + 3 * Frequency + 2 * Recency
 
 for i in target_Segmentation:
-    i['Score'] = 5*i['MonetaryValue'] + 3*i['Frequency'] + 2*i['Recency']
-
+    i['Score'] = 5 * i['MonetaryValue'] + 3 * i['Frequency'] + 2 * i['Recency']
 
 # 4th step: Clustering _________________________________________
 
 Data = target_Segmentation
-df = pd.DataFrame(Data, columns=['MonetaryValue','Frequency','Recency','Score'])
+df = pd.DataFrame(Data, columns=['MonetaryValue', 'Frequency', 'Recency', 'Score'])
 
 # 4.1 Elbow method to find optimal k
 # distortions = []
@@ -154,18 +142,17 @@ Clusters = kmeans.labels_
 for i in range(len(target_Segmentation)):
     target_Segmentation[i]['Cluster'] = Clusters[i]
 
-
-cluster1_Id=[]
-cluster2_Id=[]
-cluster3_Id=[]
-cluster1_Score=[]
-cluster2_Score=[]
-cluster3_Score=[]
+cluster1_Id = []
+cluster2_Id = []
+cluster3_Id = []
+cluster1_Score = []
+cluster2_Score = []
+cluster3_Score = []
 for i in target_Segmentation:
-    if i['Cluster']==0:
+    if i['Cluster'] == 0:
         cluster1_Id.append(int(i['ID']))
         cluster1_Score.append(int(i['Score']))
-    elif i['Cluster'] ==1:
+    elif i['Cluster'] == 1:
         cluster2_Id.append(int(i['ID']))
         cluster2_Score.append(int(i['Score']))
     else:
@@ -173,17 +160,16 @@ for i in target_Segmentation:
         cluster3_Score.append(int(i['Score']))
 
 for i in range(len(cluster1_Id)):
-    if cluster1_Id[i]>1000:
-        cluster1_Id[i]=0
+    if cluster1_Id[i] > 1000:
+        cluster1_Id[i] = 0
 
 for i in range(len(cluster2_Id)):
-    if cluster2_Id[i]>1000:
-        cluster2_Id[i]=0
+    if cluster2_Id[i] > 1000:
+        cluster2_Id[i] = 0
 
 for i in range(len(cluster3_Id)):
-    if cluster3_Id[i]>1000:
-        cluster3_Id[i]=0
-
+    if cluster3_Id[i] > 1000:
+        cluster3_Id[i] = 0
 
 plt.scatter(cluster1_Id, cluster1_Score, label="stars")
 plt.scatter(cluster2_Id, cluster2_Score, label="circle")
@@ -195,4 +181,3 @@ plt.ylabel('Score')
 plt.title('Customer Segmentation Clustering')
 plt.legend()
 plt.show()
-
