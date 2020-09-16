@@ -69,16 +69,21 @@ target_Segmentation = new_l
 
 #Counting frequency of each customer
 for x in posts:
+    sum_Of_score = int(x['Score'])
     if 'OwnerUserId' in x:
         frequency_Repeat = 0
         for y in posts:
             if 'OwnerUserId' in y :
                 if x['OwnerUserId'] == y['OwnerUserId']:
                     frequency_Repeat +=1
+                    sum_Of_score = sum_Of_score + int(y['Score'])
 
         for z in target_Segmentation:
             if z['ID'] == x['OwnerUserId']:
                 z['Frequency'] = frequency_Repeat
+
+                #Counting customer's monetary value
+                z['MonetaryValue'] = int(sum_Of_score/frequency_Repeat)
     else:
         pass
 
@@ -96,5 +101,14 @@ for i in range(number_Of_Segments):
         list_Counter += 1
 
 # 2.3 Monetary value
+target_Segmentation = sorted(target_Segmentation, key=lambda i: i['MonetaryValue'])
 
-pprint.pprint(target_Segmentation)
+list_Counter = 0
+for i in range(number_Of_Segments):
+    for j in range(number_Of_Items_In_Segments):
+        target_Segmentation[list_Counter]['MonetaryValue'] = i+1
+        list_Counter += 1
+
+# RFM measure's saved in target segmentation
+
+# 3rd step: Clustering _________________________________________
