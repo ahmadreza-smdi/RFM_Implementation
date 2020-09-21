@@ -2,6 +2,7 @@ import xml.etree.ElementTree as ET
 import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.cluster import KMeans
+from wordcloud import WordCloud, STOPWORDS
 import pprint
 # 1st step: importing data from xml file_________________________________________
 
@@ -142,42 +143,73 @@ Clusters = kmeans.labels_
 for i in range(len(target_Segmentation)):
     target_Segmentation[i]['Cluster'] = Clusters[i]
 
-cluster1_Id = []
-cluster2_Id = []
-cluster3_Id = []
-cluster1_Score = []
-cluster2_Score = []
-cluster3_Score = []
+# cluster1_Id = []
+# cluster2_Id = []
+# cluster3_Id = []
+# cluster1_Score = []
+# cluster2_Score = []
+# cluster3_Score = []
+# for i in target_Segmentation:
+#     if i['Cluster'] == 0:
+#         cluster1_Id.append(int(i['ID']))
+#         cluster1_Score.append(int(i['Score']))
+#     elif i['Cluster'] == 1:
+#         cluster2_Id.append(int(i['ID']))
+#         cluster2_Score.append(int(i['Score']))
+#     else:
+#         cluster3_Id.append(int(i['ID']))
+#         cluster3_Score.append(int(i['Score']))
+#
+# for i in range(len(cluster1_Id)):
+#     if cluster1_Id[i] > 2000:
+#         cluster1_Id[i] = 0
+#
+# for i in range(len(cluster2_Id)):
+#     if cluster2_Id[i] > 2000:
+#         cluster2_Id[i] = 0
+#
+# for i in range(len(cluster3_Id)):
+#     if cluster3_Id[i] > 2000:
+#         cluster3_Id[i] = 0
+#
+# plt.scatter(cluster1_Id, cluster1_Score, label="Cluster #1")
+# plt.scatter(cluster2_Id, cluster2_Score, label="Cluster #2")
+# plt.scatter(cluster3_Id, cluster3_Score, label='Cluster #3')
+#
+# plt.xlabel('Id')
+# plt.ylabel('Score')
+#
+# plt.title('Customer Segmentation Clustering')
+# plt.legend()
+# plt.show()
+# pprint.pprint(target_Segmentation)
+
+def remove_html_tags(text):
+    """Remove html tags from a string"""
+    import re
+    clean = re.compile('<.*?>')
+    return re.sub(clean, '', text)
+
+cloud_cluster0 =''
 for i in target_Segmentation:
-    if i['Cluster'] == 0:
-        cluster1_Id.append(int(i['ID']))
-        cluster1_Score.append(int(i['Score']))
-    elif i['Cluster'] == 1:
-        cluster2_Id.append(int(i['ID']))
-        cluster2_Score.append(int(i['Score']))
-    else:
-        cluster3_Id.append(int(i['ID']))
-        cluster3_Score.append(int(i['Score']))
+    if i['Cluster'] == 2:
+        for j in posts:
+            if 'OwnerUserId' in j:
+                if 'Body' in j :
+                    if i['ID']==j['OwnerUserId']:
+                        cloud_cluster0+=str(j['Body'])
+cloud_cluster0 = remove_html_tags(cloud_cluster0)
+stopwords = set(STOPWORDS)
+wordcloud = WordCloud(width=800, height=800,
+                      background_color='white',
+                      stopwords=stopwords,
+                      min_font_size=10).generate(cloud_cluster0)
 
-for i in range(len(cluster1_Id)):
-    if cluster1_Id[i] > 2000:
-        cluster1_Id[i] = 0
+# plot the WordCloud image
+plt.figure(figsize=(8, 8), facecolor=None)
+plt.imshow(wordcloud)
+plt.axis("off")
+plt.tight_layout(pad=0)
 
-for i in range(len(cluster2_Id)):
-    if cluster2_Id[i] > 2000:
-        cluster2_Id[i] = 0
-
-for i in range(len(cluster3_Id)):
-    if cluster3_Id[i] > 2000:
-        cluster3_Id[i] = 0
-
-plt.scatter(cluster1_Id, cluster1_Score, label="Cluster #1")
-plt.scatter(cluster2_Id, cluster2_Score, label="Cluster #2")
-plt.scatter(cluster3_Id, cluster3_Score, label='Cluster #3')
-
-plt.xlabel('Id')
-plt.ylabel('Score')
-
-plt.title('Customer Segmentation Clustering')
-plt.legend()
 plt.show()
+# print(cloud_cluster0)
